@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('./partials/head') %>
+    <title>Add NewBlog</title>
+  </head>
+  <body>
+    <%- include('./partials/navbar') %>
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <h2
+            class="text-center text-primary border-bottom pb-3 mb-4 fw-normal display-5"
+          >
+            Create New Blog Post
+            <small class="d-block mt-2 fs-5 text-muted"
+              >Share Your Thoughts with the World</small
+            >
+          </h2>
+
+          <form
+            class="bg-white p-4 rounded shadow-sm"
+            action="/blog"
+            method="post"
+            enctype="multipart/form-data"
+          >
+            <!-- Blog Title -->
+            <div class="mb-3">
+              <label for="blogTitle" class="form-label">Blog Title</label>
+              <input
+                type="text"
+                class="form-control"
+                id="blogTitle"
+                name="blogTitle"
+                placeholder="Enter blog title"
+                aria-describedby="blogTitle"
+                required
+              />
+            </div>
+
+            <!-- Category Selection -->
+            <div class="mb-3">
+              <label for="blogCategory" class="form-label">Category</label>
+              <select name="blogCategory" class="form-select" id="blogCategory">
+                <option selected>Select Category</option>
+                <option value="tech">Technology</option>
+                <option value="travel">Travel</option>
+                <option value="food">Food</option>
+                <option value="lifestyle">Lifestyle</option>
+              </select>
+            </div>
+
+            <!-- Blog Content -->
+            <div class="mb-3">
+              <label for="blogContent" class="form-label">Blog Content</label>
+              <textarea
+                class="form-control"
+                id="blogContent"
+                rows="6"
+                name="blogContent"
+                placeholder="Write your blog post..."
+              ></textarea>
+            </div>
+
+            <!-- Tags -->
+            <div class="mb-3">
+              <label for="blogTags" class="form-label">Tags</label>
+              <input
+                type="text"
+                class="form-control"
+                id="blogTags"
+                placeholder="Add tags (comma separated)"
+              />
+              <div class="form-text">
+                Example: web-development, programming, bootstrap
+              </div>
+            </div>
+
+            <!-- Featured Image Upload -->
+            <div class="mb-3">
+              <label for="featuredImage" class="form-label"
+                >Featured Image</label
+              >
+              <input
+                class="form-control"
+                name="featuredImage"
+                type="file"
+                id="featuredImage"
+                aria-describedby="featuredImage"
+              />
+            </div>
+
+            <!-- Publishing Options -->
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Publish Date</label>
+                <input type="date" class="form-control" />
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary w-100">
+              Publish Blog Post
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <%- include('./partials/scripts') %>
+  </body>
+</html>
