@@ -1,76 +1,92 @@
-const db = require("../config/connectDB.js");
+const Movie = require("../models/movieSchema.js");
 
-// "?" is a parameter placeholder in SQL queries.
-//The actual value is provided as a second argument to db.query.
-//This is called a "parameterized query" or "prepared statement".
-
-const getAllMovies = async () => {
-  const [rows] = await db.query("SELECT * FROM movies");
-  //console.log(rows)
-  return rows;
-};
-
-const getMovieById = async (id) => {
-  const [rows] = await db.query("SELECT * FROM movies WHERE id = ?", [id]);
-  return rows[0];
-};
-
-const addMovie = async (movie) => {
-  const { title, director, year, rating } = movie;
-  const [result] = await db.query(
-    "INSERT INTO movies (title, director, year, rating) VALUES (?, ?, ?, ?)",
-    [title, director, year, rating]
-  );
-  return { id: result.insertId, ...movie };
-};
-
-const updateMovie = async (id, movie) => {
-  const { title, director, year, rating } = movie;
-  if (
-    title === undefined ||
-    director === undefined ||
-    year === undefined ||
-    rating === undefined
-  ) {
-    throw new Error("All fields are required: title, director, year, rating");
+// Get all movies
+async function getAllMovies() {
+  try {
+    const movies = await Movie.findAll();
+    if (!movies || movies.length === 0) {
+      return { success: false, message: "No movies found" };
+    }
+    return { data: movies };
+  } catch (error) {
+    throw new Error("Failed to fetch movies");
   }
-  const [updateMovie] = await db.query(
-    "UPDATE movies SET title=?, director=?, year=?, rating=? WHERE id=?",
-    [title, director, year, rating, id]
-  );
-  if (updateMovie.affectedRows === 0) {
-    return null; // Movie not found
-  }
-  // Fetch and return the updated movie
-  const [rows] = await db.query("SELECT * FROM movies WHERE id = ?", [id]);
-  return rows[0];
-};
+}
 
-const deleteMovie = async (id) => {
-  // Fetch the movie first
-  const [rows] = await db.query("SELECT * FROM movies WHERE id = ?", [id]);
-  if (rows.length === 0) {
-    return null; // Movie not found
-  }
-  const movie = rows[0];
+// Get a movie by ID
+async function getMovieById(id) {
+  try {
+    if (!id) throw new Error("Movie ID is required");
 
-  const [deletedMovie] = await db.query("DELETE FROM movies WHERE id = ?", [
-    id,
-  ]);
-  if (deletedMovie.affectedRows === 0) {
-    return null; // Movie not found
+    const movie = await Movie.findByPk(id);
+
+    if (!movie) {
+      return { success: false, message: `Movie with ID ${id} not found` };
+    }
+
+    return { success: true, data: movie };
+  } catch (error) {
+    throw new Error(error.message || "Failed to fetch movie");
   }
-  return { ...movie, message: "Movie deleted" };
-};
+}
+
+// Add a new movie
+async function addMovie(data) {
+  try {
+    const movie = await Movie.create(data);
+    return { success: true, message: "Movie added successfully", data: movie };
+  } catch (error) {
+    throw new Error("Failed to add movie");
+  }
+}
+
+// Update an existing movie
+async function updateMovie(id, data) {
+  try {
+    if (!id) throw new Error("Movie ID is required");
+
+    const movie = await Movie.findByPk(id);
+    if (!movie) {
+      return { success: false, message: `Movie with ID ${id} not found` };
+    }
+
+    await Movie.update(data, { where: { id } });
+    const updated = await Movie.findByPk(id);
+    return {
+      success: true,
+      message: `Movie with ID ${id} updated successfully`,
+      data: updated,
+    };
+  } catch (error) {
+    throw new Error(error.message || "Failed to update movie");
+  }
+}
+
+// Delete a movie
+async function deleteMovie(id) {
+  try {
+    if (!id) throw new Error("Movie ID is required");
+
+    const movie = await Movie.findByPk(id);
+    if (!movie) {
+      return { success: false, message: `Movie with ID ${id} not found` };
+    }
+
+    await Movie.destroy({ where: { id } });
+    return {
+      success: true,
+      message: `Movie with ID ${id} deleted successfully`,
+      data:movie,
+    };
+  } catch (error) {
+    throw new Error(error.message || "Failed to delete movie");
+  }
+}
 
 module.exports = {
   getAllMovies,
-
   getMovieById,
-
   addMovie,
-
   updateMovie,
-
   deleteMovie,
 };

@@ -1,41 +1,79 @@
-const service = require("../services/movieService.js");
+const movieService = require("../services/movieService.js");
 
-const getAll = async (req, res) => {
-  const movies = await service.getAllMovies();
-  if (!movies || movies.length === 0) {
-    return res.status(404).json({ message: "No movies found" });
+// Get all movies
+async function getAllMovies(req, res) {
+  try {
+    const result = await movieService.getAllMovies();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
-  res.json(movies);
-};
+}
 
-const getById = async (req, res) => {
-  const movie = await service.getMovieById(req.params.id);
-  if (!movie) return res.status(404).json({ message: "Not found" });
-  res.json(movie);
-};
+// Get movie by ID
+async function getMovieById(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const result = await movieService.getMovieById(id);
 
-const create = async (req, res) => {
-  const movie = await service.addMovie(req.body);
-  res.status(201).json({ ...movie, message: "Movie added successfully" });
-};
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
 
-const update = async (req, res) => {
-  const  movie  = await service.updateMovie(req.params.id, req.body);
-  //console.log(movie)
-  if (!movie) return res.status(404).json({ message: "Not found" });
-  res.json({ ...movie, message: "Movie updated successfully" });
-};
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
 
-const remove = async (req, res) => {
-  const result = await service.deleteMovie(req.params.id);
-  if (!result) return res.status(404).json({ message: "Not found" });
-  res.json(result);
-};
+// Add a new movie
+async function addMovie(req, res) {
+  try {
+    const data = req.body;
+    const result = await movieService.addMovie(data);
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+// Update an existing movie
+async function updateMovie(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const data = req.body;
+
+    const result = await movieService.updateMovie(id, data);
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+// Delete a movie
+async function deleteMovie(req, res) {
+  try {
+    const id = parseInt(req.params.id);
+    const result = await movieService.deleteMovie(id);
+
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
 
 module.exports = {
-  getAll,
-  getById,
-  create,
-  update,
-  remove,
+  getAllMovies,
+  getMovieById,
+  addMovie,
+  updateMovie,
+  deleteMovie,
 };
